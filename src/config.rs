@@ -2994,6 +2994,7 @@ pub mod keys {
         "allow-command-line-settings-when-settings-disabled";
 
     // Connection punch-through options
+    pub const OPTION_ENABLE_TCP_PUNCH: &str = "enable-tcp-punch";
     pub const OPTION_ENABLE_UDP_PUNCH: &str = "enable-udp-punch";
     pub const OPTION_ENABLE_IPV6_PUNCH: &str = "enable-ipv6-punch";
     pub const OPTION_ENABLE_WEBRTC: &str = "enable-webrtc";
@@ -3127,6 +3128,7 @@ pub mod keys {
         OPTION_ALLOW_AUTO_RECORD_OUTGOING,
         OPTION_HIDE_RECORDING_BUTTON,
         OPTION_VIDEO_SAVE_DIRECTORY,
+        OPTION_ENABLE_TCP_PUNCH,
         OPTION_ENABLE_UDP_PUNCH,
         OPTION_ENABLE_IPV6_PUNCH,
         OPTION_ENABLE_WEBRTC,
