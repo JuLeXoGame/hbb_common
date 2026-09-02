@@ -1,10 +1,10 @@
 use crate::ResultType;
+use nix::unistd::{geteuid, User};
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
     process::Command,
 };
-use users::{get_current_uid, get_user_by_uid, os::unix::UserExt};
 
 use sctk::{
     output::OutputData,
@@ -475,25 +475,27 @@ pub fn shell_quote(s: &str) -> String {
 /// an attacker might manipulate environment variables to influence privileged
 /// operations.
 pub fn get_home_dir_trusted() -> Option<PathBuf> {
-    let uid = get_current_uid();
-    match get_user_by_uid(uid) {
-        Some(user) => {
-            let home = user.home_dir();
-            if Path::is_dir(home) {
-                Some(PathBuf::from(home))
-            } else {
-                log::warn!(
-                    "Home directory for uid {} does not exist or is not a directory: {:?}",
-                    uid,
-                    home
-                );
-                None
-            }
-        }
-        None => {
+    let uid = geteuid();
+    let user = match User::from_uid(uid) {
+        Ok(Some(user)) => user,
+        Ok(None) => {
             log::warn!("Failed to get user info for uid {}", uid);
-            None
+            return None;
         }
+        Err(err) => {
+            log::warn!("Failed to get user info for uid {}: {}", uid, err);
+            return None;
+        }
+    };
+    if Path::is_dir(&user.dir) {
+        Some(user.dir)
+    } else {
+        log::warn!(
+            "Home directory for uid {} does not exist or is not a directory: {:?}",
+            uid,
+            user.dir
+        );
+        None
     }
 }
 
