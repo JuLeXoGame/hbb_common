@@ -69,7 +69,15 @@ message OSLogin {
   string password = 2;
 }
 
+message NetworkAuthorization {
+  string token = 1;
+  int64 timestamp = 2;
+  string nonce = 3;
+  bytes signature = 4;
+}
+
 message LoginRequest {
+  NetworkAuthorization relaisdesk_authorization = 18;
   string username = 1;
   bytes password = 2;
   string my_id = 4;
@@ -699,6 +707,8 @@ message OptionMessage {
 }
 
 message TestDelay {
+  string relaisdesk_challenge = 5;
+  NetworkAuthorization relaisdesk_authorization = 6;
   int64 time = 1;
   bool from_client = 2;
   uint32 last_delay = 3;
