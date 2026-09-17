@@ -1129,10 +1129,15 @@ impl Config {
             let (pk, sk) = sign::gen_keypair();
             let key_pair = (sk.0.to_vec(), pk.0.into());
             config.key_pair = key_pair.clone();
-            std::thread::spawn(|| {
-                let mut config = CONFIG.write().unwrap();
-                config.key_pair = key_pair;
-                config.store();
+            // Persist the keypair synchronously so it survives process kills.
+            // We write the raw config directly (bypassing the CONFIG lazy_static)
+            // because get_key_pair() may be invoked during CONFIG initialisation
+            // and taking CONFIG.write() here would deadlock.
+            Config::store_(&config, "");
+            // Update the in-memory CONFIG cache asynchronously (the thread will
+            // block until lazy_static init completes, then proceed).
+            std::thread::spawn(move || {
+                CONFIG.write().unwrap().key_pair = key_pair;
             });
         }
         *lock = Some(config.key_pair.clone());
