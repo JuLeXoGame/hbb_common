@@ -58,6 +58,12 @@ mod tests {
     use super::*;
 
     #[test]
+    fn decodes_frame_from_previous_protocol_implementation() {
+        let frame = b"\x28\xb5\x2f\xfd\x00\x58\x59\x01\x00RelaisDesk compression protocol fixture v1\n";
+        assert_eq!(decompress(frame), b"RelaisDesk compression protocol fixture v1\n");
+    }
+
+    #[test]
     fn rejects_data_larger_than_limit() {
         let compressed = zstd::encode_all(&vec![0u8; 1025][..], 0).unwrap();
         assert!(decompress_with_limit(&compressed, 1024).is_err());
